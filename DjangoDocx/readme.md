@@ -193,3 +193,85 @@ pip install XlsxWriter==1.2.8
 ---
 ---
 
+# **Installation**
+
+---
+
+- Create a Django Project
+
+```cmd
+~$ django-admin startproject DjangoDocx
+```
+
+- Create an app
+
+```cmd
+~$ python manage.py startapp app
+```
+
+- `DjangoDocx/DjangoDocx/settings.py`
+
+- Set DB Connections.
+
+```py
+DATABASES = {
+    'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'OPTIONS': {
+                'options': '-c search_path=django,app'
+            },
+            'NAME': 'django_docx',
+            'USER': 'postgres',
+            'PASSWORD': 'IMRUL',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+    },
+    'legacy': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'OPTIONS': {
+                'options': '-c search_path=legacy,app'
+            },
+            'NAME': 'django_docx',
+            'USER': 'postgres',
+            'PASSWORD': 'IMRUL',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+    }
+}
+```
+
+- Set  value of key `DIRS` to `['templates']` to use templates
+
+```py
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+```
+
+- Add the app to the `INSTALLED_APPS` variable to register the app.
+
+```py
+INSTALLED_APPS = [
+    'app',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+```
+
+---
