@@ -12,10 +12,15 @@
 
 - install venv on mechine
 
-1. pip install virtualenvwrapper-win  
+```cmd
+~$ pip install virtualenvwrapper-win  
+```
 
 - create an venv
-2. mkvirtualenv test    
+
+```cmd
+~$ mkvirtualenv test
+```    
 
 - install django on that env              
 
@@ -187,3 +192,4 @@ pip install XlsxWriter==1.2.8
 
 ---
 ---
+
