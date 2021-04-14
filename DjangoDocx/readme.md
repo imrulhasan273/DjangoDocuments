@@ -320,12 +320,20 @@ urlpatterns = [
 - `app/views.py`
 
 ```py
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
+```
 
+```py
 # Home Page View
 def index(request):
     return render(request, 'homepage.html')
+```
 
-# --------------------------------START AUTHENTICATION VIEWS ----------------------------------------
+```py
 def signup(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -343,7 +351,9 @@ def signup(request):
     else:
         form = UserCreationForm()
         return render(request, 'signup.html', {'form': form})
+```
 
+```py
 def signin(request):
     if request.user.is_authenticated:
         return render(request, 'homepage.html')
@@ -360,12 +370,12 @@ def signin(request):
     else:
         form = AuthenticationForm()
         return render(request, 'signin.html', {'form': form})
+```
 
-
+```py
 def signout(request):
     logout(request)
     return redirect('/')
-# -------------------------------- END AUTHENTICATION VIEWS ----------------------------------------
 ```
 
 ## Create templates in `templates` directory
