@@ -528,3 +528,75 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'assets')
 
 ---
 
+# **Login/Logout System**
+
+---
+
+- `base.html`
+
+```html
+<ul class="navbar-nav">
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        {{ user.username }}
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'signout' %}">Log Out</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'signin' %}">Sign In</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+    </li>
+    {% endif %}
+</ul>
+```
+
+- `signin.html`
+
+```html
+<div>
+    <!-- {% url 'signin' %} -->
+    <form method="POST" action="{% url 'signin' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+```
+
+- `signup.html`
+
+```html
+<div>
+    <!-- {% url 'signup' %} -->
+    <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+        </div>
+        <div class="form-group">
+            <label for="password1">Password</label>
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label for="password1">Re-Password</label>
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+```
+
+---
+---
