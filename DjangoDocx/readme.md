@@ -419,47 +419,56 @@ def signout(request):
 - `templates/base.html`
 
 ```html
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% block head %}
-        <link rel="stylesheet" href="style.css" />
-        <title>
-            {% block title %}
-            {% endblock %} - My Webpage
-        </title>
+    <title>
+        {% block title %}
+            BASE TEMPLATE
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{%  static 'custom/style.css' %}">
+    <link rel="stylesheet" href="{%  static 'bootstrap4\css\bootstrap.min.css' %}">
+    {% block stylesheet %}
+        <!-- page varying styles are here -->
     {% endblock %}
 </head>
 <body>
+    <div id="header">   
+    </div>
+
     <div id="content">
         {% block content %}
+        
         {% endblock %}
     </div>
 
     <div id="footer">
-        {% block footer %}
-        &copy; Copyright 2008 by <a href="http://domain.invalid/">you</a>.
-        {% endblock %}
     </div>
+
+    <script src="{% static 'bootstrap4\js\bootstrap.min.js' %}"></script>
+    {% block script %}
+        <!-- page varying scripts are here -->
+    {% endblock %}
 </body>
 </html>
 ```
 
-- `templates/home.html`
 
-```py
+### Home Template
+
+- `templates/homepage.html`
+
+```html
 {% extends "base.html" %}
-{% block title %}Index{% endblock %}
-{% block head %}
-    <style type="text/css">
-        .important { color: #336699; }
-    </style>
+
+{% block title %}
+    HOMEPAGE
 {% endblock %}
+
 {% block content %}
-    <h1>Home Page</h1>
-    <p class="important">
-      Welcome to my awesome homepage.
-    </p>
+    <!-- here the content part -->
 {% endblock %}
 ```
 
@@ -501,6 +510,18 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'assets')
 
 ```html
 <link rel="stylesheet" href="{%  static 'custom/style.css' %}">
+```
+
+- Add scripts like below
+
+```html
+<script src="{% static 'bootstrap4\js\bootstrap.min.js' %}"></script>
+```
+
+- Add below code on top of the html file
+
+```html
+{% load static %}
 ```
 
 > Django will find `custom/styles.css` in **static** folder.
