@@ -246,7 +246,8 @@ DATABASES = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        # 'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -275,3 +276,152 @@ INSTALLED_APPS = [
 ```
 
 ---
+
+# **Authentication**
+
+---
+
+### Add apps `urls.py` in main Projects `urls.py`
+
+- `DjangoDocx/urls.py`
+
+```py
+from django.contrib import admin
+from django.urls import path,include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('app.urls'))
+]
+```
+
+> here `app.urls` is included in the Project's `urls.py`. Because Django will first look for url in Project `urls.py` not apps urls.py. 
+
+- `app/urls.py`
+
+```py
+from django.contrib import admin
+from django.urls import path,include
+from app import views
+
+urlpatterns = [
+    path('', views.index, name='home'), # Home Page url
+    # AUTH URLS
+    path('signin', views.signin, name='signin'),
+    path('signup', views.signup, name='signup'),
+    path('signout', views.signout, name='signout')
+]
+```
+
+> here all the `urls` for **authentication** and **homepage**  for the app.
+
+### Create views for urls.
+
+- `app/views.py`
+
+```py
+
+# Home Page View
+def index(request):
+    return render(request, 'homepage.html')
+
+# --------------------------------START AUTHENTICATION VIEWS ----------------------------------------
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('/')
+        else:
+            return render(request, 'signup.html', {'form': form})
+    else:
+        form = UserCreationForm()
+        return render(request, 'signup.html', {'form': form})
+
+def signin(request):
+    if request.user.is_authenticated:
+        return render(request, 'homepage.html')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            form = AuthenticationForm(request.POST)
+            return render(request, 'signin.html', {'form': form})
+    else:
+        form = AuthenticationForm()
+        return render(request, 'signin.html', {'form': form})
+
+
+def signout(request):
+    logout(request)
+    return redirect('/')
+# -------------------------------- END AUTHENTICATION VIEWS ----------------------------------------
+```
+
+## Create templates in `templates` directory
+
+---
+
+### Base Template
+
+- `templates/base.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <link rel="stylesheet" href="style.css" />
+        <title>
+            {% block title %}
+            {% endblock %} - My Webpage
+        </title>
+    {% endblock %}
+</head>
+<body>
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        &copy; Copyright 2008 by <a href="http://domain.invalid/">you</a>.
+        {% endblock %}
+    </div>
+</body>
+</html>
+```
+
+- `templates/home.html`
+
+```py
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>Home Page</h1>
+    <p class="important">
+      Welcome to my awesome homepage.
+    </p>
+{% endblock %}
+```
+
+
+
+
+
