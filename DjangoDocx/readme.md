@@ -277,11 +277,43 @@ INSTALLED_APPS = [
 
 ---
 
+# **Add Profile Model**
+
+---
+
+- `app/models.py`
+
+```py
+from django.db import models
+from django.contrib.auth.models import User
+```
+
+```py
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    middle_name = models.CharField(max_length=30, blank=True)
+    dob = models.DateField(null=True, blank=True)
+```
+
+### Add The model `Profile` in `admin.py` to view this model in admin panel.
+
+```py
+from django.contrib import admin
+from .models import Profile
+
+admin.site.register(Profile)
+```
+
+---
+
+---
+
 # **Authentication**
 
 ---
 
 ### Add apps `urls.py` in main Projects `urls.py`
+
 
 - `DjangoDocx/urls.py`
 
@@ -431,7 +463,47 @@ def signout(request):
 {% endblock %}
 ```
 
+---
 
+# **Set Up for Static Files**
 
+---
 
+## Step 1
+
+- Add below files in `settings.py`
+
+```py
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+STATIC_ROOT = os.path.join(BASE_DIR,  'assets')
+```
+
+## Step 2
+
+> Create a folder named `static` in the Project Folder. `static` folder should be in the same directory as `manage.py` file.
+
+## Step 3
+
+- Run the collectstatic management command:
+
+```cmd
+~$ python manage.py collectstatic
+```
+
+> This will copy all files from your static folders into the STATIC_ROOT directory defined in `settings.py`
+
+## Step 4
+
+- Add your stylesheet like below.
+
+```html
+<link rel="stylesheet" href="{%  static 'custom/style.css' %}">
+```
+
+> Django will find `custom/styles.css` in **static** folder.
+
+---
 
