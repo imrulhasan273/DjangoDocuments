@@ -599,4 +599,103 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'assets')
 ```
 
 ---
+
 ---
+
+# **Create New User after Validation**
+
+---
+
+## Email Validation Function
+
+```py
+from django.contrib.auth.hashers import make_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+```
+
+```py
+def validateEmail(email):
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False
+```
+
+## Password Validation Function
+
+```py
+def validatePassword(value):
+    """
+        Validates that a password is at least 7 characters long and has at least 1 digit and 1 letter.
+    """
+    flag = True
+    min_length = 7
+    if len(value) < min_length:
+        flag = False
+        return flag
+
+    # check for digit
+    if not any(char.isdigit() for char in value):
+        flag = False
+        return flag
+
+    # check for letter
+    if not any(char.isalpha() for char in value):
+        flag = False
+        return flag
+        
+    return flag
+```
+
+
+## Sign Up New User 
+
+- `METHOD 1: CUSTOM LOGIC + ORM`
+
+```py
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    if request.method == 'POST':
+        if validateEmail(request.POST['email']):
+            if User.objects.filter(email=request.POST['email']).exists():
+                print("Email Already Taken")
+                return redirect('/')
+            else:
+                if User.objects.filter(username=request.POST['username']).exists():
+                    print("Username Already Taken")
+                    return redirect('/')
+                else:
+                    if request.POST['password1'] == request.POST['password2']:
+                        if validatePassword(request.POST['password1']):
+                            user = User.objects.create(
+                                username=request.POST['username'],
+                                email=request.POST['email'],
+                                password = make_password(request.POST['password1'])
+                            )
+                            user.save()
+                            # add profile, and user_group info
+                            
+                            #
+                            login(request, user)
+                            return redirect('/')
+                        else:
+                            print("Password must be at least 7 characters long and must contain at least 1 digit and 1 letter")
+                            return redirect('/')
+                    else:
+                        print("Password Unmatched")
+                        return redirect('/')
+        else:
+            print("Invalid Email")
+            return redirect('/')
+
+    else:
+        form = UserCreationForm()
+        return render(request, 'signup.html', {'form': form})
+```
+
+---
+
