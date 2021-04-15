@@ -760,10 +760,151 @@ messages.add_message(request, messages.SUCCESS, 'Changes successfully saved.')
 ```html
 {% if messages %}
     {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">{{ message }}</div>
+        <div class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">
+            {{ message }}
+        </div>
     {% endfor %}
 {% endif %}
 ```
 
 ---
+
+# **Optimize the Sign Up System**
+
+---
+
+- `models.py`
+
+```py
+from django.db import models
+from django.contrib.auth.models import User
+
+class Role(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    mobile = models.CharField(max_length=30, blank=True)
+    dob = models.DateField(null=True, blank=True)
+    role = models.ForeignKey(Role,on_delete=models.DO_NOTHING,null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        ordering = ['user']
+```
+
+- `admin.py` [Register the `Role` Model in Admin Site]
+
+```py
+admin.site.register(Role)
+```
+
+- `signup.html`
+
+```html
+{% extends "base.html" %}
+{% block title %} SIGN UP {% endblock %}
+{% block content %}
+    <h1>Sign Up</h1>
+    <div>
+        <!-- {% url 'signup' %} -->
+        <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+            </div>
+
+            <div class="form-group">
+              <label for="username">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email">
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone">
+            </div>
+
+            <div class="form-group">
+              <label for="role">Account Type</label>
+              <select class="form-control" id="role" name="role">
+                <option selected>Choose...</option>
+                <option value="counsellor">Counsellor</option>
+                <option value="beneficiary">Benificiary</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="password1">Password</label>
+              <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="password1">Re-Password</label>
+                <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+    </div>
+{% endblock %}
+```
+
+- `views.py`
+
+```py
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    if request.method == 'POST':
+        if validateEmail(request.POST['email']):
+            if User.objects.filter(email=request.POST['email']).exists():
+                messages.error(request, 'Email Already Taken.')
+                return redirect('/')
+            else:
+                if User.objects.filter(username=request.POST['username']).exists(): # Check if user already exists or not
+                    messages.error(request, 'Username Already Taken.')
+                    return redirect('/')
+                else:
+                    if request.POST['password1'] == request.POST['password2']:      # Check both password field is mathced or not
+                        if validatePassword(request.POST['password1']):             # Check the validity of password with given rule
+                            user = User.objects.create(                             
+                                username=request.POST['username'],
+                                email=request.POST['email'],
+                                password = make_password(request.POST['password1'])
+                            )
+                            user.save()                                             # Insert the User instalnce
+
+                            profile = Profile.objects.create(
+                                mobile=request.POST['phone'],
+                                user_id=user.id,                                    # user_id is added directly. OneToOne relation with User
+                                role=Role.objects.get(name=request.POST['role'])    # Profile.role must be added using Role instalce as it is Foreign Key of Role Model
+                            )
+                            profile.save()                                          # Insert the Profile instance with the inserted User
+
+                            login(request, user)                                    # Authentication done
+                            messages.success(request, 'Account Created.')
+                            return redirect('/')
+                        else:
+                            messages.error(request, 'Password must be at least 7 characters long and must contain at least 1 digit and 1 letter.')
+                            return redirect('/')
+                    else:
+                        messages.error(request, 'Password Unmatched.')
+                        return redirect('/')
+        else:
+            messages.error(request, 'Invalid Email.')
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+        return render(request, 'signup.html', {'form': form})
+```
 

@@ -88,11 +88,16 @@ def signup(request):
                                 email=request.POST['email'],
                                 password = make_password(request.POST['password1'])
                             )
-                            user.save()
-                            # add profile, and user_group info
+                            user.save()                                             # Insert the User instalnce
 
-                            #
-                            login(request, user)
+                            profile = Profile.objects.create(
+                                mobile=request.POST['phone'],
+                                user_id=user.id,                                    # user_id is added directly. OneToOne relation with User
+                                role=Role.objects.get(name=request.POST['role'])    # Profile.role must be added using Role instalce as it is Foreign Key of Role Model
+                            )
+                            profile.save()                                          # Insert the Profile instance with the inserted User
+
+                            login(request, user)                                    # Authentication done
                             messages.success(request, 'Account Created.')
                             return redirect('/')
                         else:
