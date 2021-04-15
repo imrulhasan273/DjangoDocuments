@@ -699,3 +699,71 @@ def signup(request):
 
 ---
 
+# **Alert System**
+
+---
+
+## Step 1
+
+-  Configure a message storage in your settings.py
+
+```py
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'  # PREFERED ONE
+```
+
+- or if you are not using sessions, use CookieStorage:
+
+```py
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.CookieStorage'
+```
+
+## Step 2
+
+- In your view, import django.contrib.messages:
+
+```py
+from django.contrib import messages
+```
+
+## Step 3
+
+- Set the message data before returning the HttpResonse:
+
+```py
+messages.success(request, 'Changes successfully saved.')    # PREFERED ONE
+messages.error(request, 'Changes not saved.')               # PREFERED ONE
+```
+- Or 
+
+```py
+messages.add_message(request, messages.SUCCESS, 'Changes successfully saved.')
+```
+
+## Step 4
+
+- `templates`
+
+- In your template you can then use the messages like this if you are using Bootstrap alerts:
+
+- `Way 1:`
+
+```html
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+```
+
+- `Way 2: Prefered One`
+
+```html
+{% if messages %}
+    {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+```
+
+---
+

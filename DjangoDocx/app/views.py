@@ -29,6 +29,8 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
+from django.contrib import messages
+
 cursor = connection.cursor()
 
 def index(request):
@@ -60,7 +62,7 @@ def validatePassword(value):
     if not any(char.isalpha() for char in value):
         flag = False
         return flag
-        
+
     return flag
 
 # --------------------------------START AUTHENTICATION VIEWS ----------------------------------------
@@ -72,11 +74,11 @@ def signup(request):
     if request.method == 'POST':
         if validateEmail(request.POST['email']):
             if User.objects.filter(email=request.POST['email']).exists():
-                print("Email Already Taken")
+                messages.error(request, 'Email Already Taken.')
                 return redirect('/')
             else:
                 if User.objects.filter(username=request.POST['username']).exists():
-                    print("Username Already Taken")
+                    messages.error(request, 'Username Already Taken.')
                     return redirect('/')
                 else:
                     if request.POST['password1'] == request.POST['password2']:
@@ -91,17 +93,17 @@ def signup(request):
 
                             #
                             login(request, user)
+                            messages.success(request, 'Account Created.')
                             return redirect('/')
                         else:
-                            print("Password must be at least 7 characters long and must contain at least 1 digit and 1 letter")
+                            messages.error(request, 'Password must be at least 7 characters long and must contain at least 1 digit and 1 letter.')
                             return redirect('/')
                     else:
-                        print("Password Unmatched")
+                        messages.error(request, 'Password Unmatched.')
                         return redirect('/')
         else:
-            print("Invalid Email")
+            messages.error(request, 'Invalid Email.')
             return redirect('/')
-
     else:
         form = UserCreationForm()
         return render(request, 'signup.html', {'form': form})
