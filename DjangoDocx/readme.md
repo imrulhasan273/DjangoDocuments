@@ -955,6 +955,36 @@ def test(request):
 </form>
 ```
 
+- or `customize the formate`
+
+```html
+<form method="POST" action="">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.subject.errors }}
+        <label for="id_subject">Subject:</label>
+        {{ form.subject }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.message.errors }}
+        <label for="id_message">Message:</label>
+        {{ form.message }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.sender.errors }}
+        <label for="id_sender">Sender:</label>
+        {{ form.sender }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.cc_myself.errors }}
+        <label for="id_cc_myself">CC yourself ?</label>
+        {{ form.cc_myself }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+```
+
 ---
 
 
