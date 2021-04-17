@@ -867,7 +867,7 @@ def signup(request):
 
     if request.method == 'POST':
         if validateEmail(request.POST['email']):
-            if User.objects.filter(email=request.POST['email']).exists():
+            if User.objects.filter(email=request.POST['email']).exists():           # Check if email already taken or not 
                 messages.error(request, 'Email Already Taken.')
                 return redirect('/')
             else:
@@ -907,4 +907,54 @@ def signup(request):
         form = UserCreationForm()
         return render(request, 'signup.html', {'form': form})
 ```
+
+
+---
+
+# **Creating forms using `forms.py`**
+
+---
+
+## Step 1
+
+- `forms.py`    
+
+```py
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    message = forms.CharField(widget=forms.Textarea)
+    sender = forms.EmailField()
+    cc_myself = forms.BooleanField(required=False)
+```
+
+## Step 2
+
+- `views.py`
+
+```py
+from .forms import ContactForm
+```
+
+```py
+def test(request):
+    form = ContactForm(request.POST)
+    return render(request, 'test.html', {'form': form})
+```
+
+## Step 3
+
+- `test.html`
+
+```html
+<form method="POST" action="">
+{% csrf_token %}
+    {{ form }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+```
+
+---
+
 

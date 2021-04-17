@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %} SIGN IN {% endblock %}
+
+{% block content %}
+    <h1>Test Form</h1>
+
+    <div>
+        <!-- {% url 'signin' %} -->
+        <form method="POST" action="">
+        {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+      
+{% endblock %}
+

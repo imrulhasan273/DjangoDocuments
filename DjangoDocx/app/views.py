@@ -30,8 +30,15 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
 from django.contrib import messages
+from .forms import ContactForm
 
 cursor = connection.cursor()
+
+def test(request):
+    form = ContactForm(request.POST)
+    # user = User.objects.raw('select * from app.auth_user au inner join app.app_profile ap on au.id = ap.user_id inner join app.app_role ar on ap.role_id = ar.id')[0]
+    # print(user.role_id)
+    return render(request, 'test.html', {'form': form})
 
 def index(request):
     return render(request, 'homepage.html')
@@ -52,17 +59,14 @@ def validatePassword(value):
     if len(value) < min_length:
         flag = False
         return flag
-
-    # check for digit
-    if not any(char.isdigit() for char in value):
+    elif not any(char.isdigit() for char in value):
         flag = False
         return flag
-
-    # check for letter
-    if not any(char.isalpha() for char in value):
+    elif not any(char.isalpha() for char in value):
         flag = False
         return flag
-
+    else:
+        pass 
     return flag
 
 # --------------------------------START AUTHENTICATION VIEWS ----------------------------------------
